@@ -9,15 +9,24 @@ import threading
 class MagicFrame(Frame):
 	def __init__(self, parent=None):
 		Frame.__init__(self, parent)
-		self.pack(expand=YES, fill=BOTH)	
+		self.pack(expand=YES, fill=BOTH)
+		self.master.title("MagicPhoto")
 		toolBar = Frame(self)
 		toolBar.pack(side=TOP, fill=X)
-		openButton = Button(toolBar, text=u'open', command = self.on_open)
+		openButton = Button(toolBar, text=u'打开', command = self.on_open)
 		openButton.pack(side=LEFT, expand=NO)
-		saveButton = Button(toolBar, text=u'save', command = self.on_save)
+		saveButton = Button(toolBar, text=u'保存', command = self.on_save)
 		saveButton.pack(side=LEFT, expand=NO)
-		magicButton = Button(toolBar, text=u'magic', command = self.on_magic)
+		magicButton = Button(toolBar, text=u'Magic', command = self.on_magic)
 		magicButton.pack(side=LEFT, expand=NO)
+		self.tileSizeFrame = Frame(toolBar)
+		self.tileSizeFrame.pack(side=LEFT, expand=NO)
+		self.tileSizeVar = IntVar()
+		self.tileSizeVar.set(48)
+		Label(self.tileSizeFrame, text=u"小方块的大小").pack(side=LEFT)
+		Radiobutton(self.tileSizeFrame,variable = self.tileSizeVar,text = '32',value = 32).pack(side=LEFT)
+		Radiobutton(self.tileSizeFrame,variable = self.tileSizeVar,text = '48',value = 48).pack(side=LEFT)
+		Radiobutton(self.tileSizeFrame,variable = self.tileSizeVar,text = '64',value = 64).pack(side=LEFT)
 		self.body = Frame(self, width=10, height=10)
 		self.body.pack(side=TOP, expand=YES, fill=BOTH)
 		self.imgLabel=Label(self.body)
@@ -30,6 +39,7 @@ class MagicFrame(Frame):
 		self.magicing = False
 		self.lock = thread.allocate_lock()
 		self.tiles = {48:None, 32:None, 64:None}
+		self.busyGif = "media/gif/1.gif"
 	def make_show(self):
 		self.lock.acquire()
 		self.imgForShow = self.img.copy()
@@ -60,28 +70,28 @@ class MagicFrame(Frame):
 		try:
 			self.imgForShow.seek(self.imgForShow.tell()+1)
 		except EOFError, e:
-			self.imgForShow = Image.open("1.gif")
+			self.imgForShow = Image.open(self.busyGif)
 		self.imgForLable = ImageTk.PhotoImage(self.imgForShow)
 		self.imgLabel.config(image=self.imgForLable)
 		self.lock.release()		
 		if self.magicing == True:
 			threading.Timer(0.02, self.next_frame).start()
 	def on_magic(self):
-		if self.magicing == False:
+		if self.img and self.magicing == False:
 			self.magicing = True
-			self.imgForShow = Image.open("1.gif")
+			self.imgForShow = Image.open(self.busyGif)
 			self.imgForLable = ImageTk.PhotoImage(self.imgForShow)
 			self.imgLabel.config(image=self.imgForLable)
 			threading.Timer(0.02, self.next_frame).start()
 			thread.start_new_thread(self.on_magic_thread, ())
 	def on_magic_thread(self):
-		tile_size = 48
+		tileSize = self.tileSizeVar.get()
 		if self.img:
-			if self.tiles[tile_size] == None:
-				self.tiles[tile_size], temp = MagicPhoto.load_tile("tile/" + str(tile_size) + "/*")
-			new_size = (self.img.size[0]/tile_size*tile_size, self.img.size[1]/tile_size*tile_size)
-			self.img = self.img.resize(new_size)
-			self.img = MagicPhoto.make_output(self.tiles[tile_size], self.img)
+			if self.tiles[tileSize] == None:
+				self.tiles[tileSize], temp = MagicPhoto.load_tile("tile/" + str(tileSize) + "/*")
+			newSize = (self.img.size[0]/tileSize*tileSize, self.img.size[1]/tileSize*tileSize)
+			self.img = self.img.resize(newSize)
+			self.img = MagicPhoto.make_output(self.tiles[tileSize], self.img)
 			self.magicing = False
 			self.make_show()
 if __name__ == "__main__":
