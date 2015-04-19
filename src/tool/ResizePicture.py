@@ -9,10 +9,10 @@ sys.setdefaultencoding('utf8')
 	
 if __name__ == "__main__":
 	parse = argparse.ArgumentParser(prog="ResizePicture", description="resize picture.")
-	parse.add_argument("path", help="a url, the start point")
-	parse.add_argument("width", type=int, help="a url, the start point")
-	parse.add_argument("height", type=int, help="a url, the start point")
-	parse.add_argument("output", help="a url, the start point")
+	parse.add_argument("path", help="pics to be resized, 'dir/*.jpg' imply all jpg files in dir")
+	parse.add_argument("width", type=int, help="width")
+	parse.add_argument("height", type=int, help="height")
+	parse.add_argument("output", help="output directory")
 	args = parse.parse_args()
 
 	if os.path.isfile(args.output):
