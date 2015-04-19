@@ -75,14 +75,14 @@ class MagicFrame(Frame):
 		self.imgLabel.config(image=self.imgForLable)
 		self.lock.release()		
 		if self.magicing == True:
-			threading.Timer(0.02, self.next_frame).start()
+			threading.Timer(0.04, self.next_frame).start()
 	def on_magic(self):
 		if self.img and self.magicing == False:
 			self.magicing = True
 			self.imgForShow = Image.open(self.busyGif)
 			self.imgForLable = ImageTk.PhotoImage(self.imgForShow)
 			self.imgLabel.config(image=self.imgForLable)
-			threading.Timer(0.02, self.next_frame).start()
+			threading.Timer(0.04, self.next_frame).start()
 			thread.start_new_thread(self.on_magic_thread, ())
 	def on_magic_thread(self):
 		tileSize = self.tileSizeVar.get()
