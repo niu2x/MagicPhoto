@@ -1,5 +1,5 @@
 #-*- coding:utf-8 -*-
-from Tkinter import *
+from tkinter import *
 from tkFileDialog import askopenfilename 
 from tkFileDialog import asksaveasfilename 
 from PIL import Image, ImageTk
